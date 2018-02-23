@@ -4,6 +4,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import argparse
+import configparser
 import os
 import time
 import datetime as dt
@@ -53,8 +54,8 @@ def main(args):
         args.data_dir, args.save_dir
 
     # 'SAVE_DIR'に今日の日付を足す
-    SAVE_DIR = os.path.join(SAVE_DIR, today_time)
-
+    do_time = os.datetime.today().strftime("%H_%M_%S")
+    SAVE_DIR = os.path.join(SAVE_DIR, today_time, do_time)
     if not os.path.isdir(SAVE_DIR):
         os.makedirs(SAVE_DIR)
 
@@ -62,23 +63,27 @@ def main(args):
     # Hyper Parameter
     #######################
     param_dic = {}
-    level = param_dic['level'] = 4
-    hemisphere = param_dic['hemisphere'] = 50
+    config = configparser.ConfigParser()
+    config.read('config.ini')
+    param_sphere = config['sphere']
+    level = param_dic['level'] = int(param_sphere['level'])
+    hemisphere = param_dic['hemisphere'] int(param_sphere['hemisphere'])
     Q = param_dic['Q'] = 2**level
-    title = param_dic['title'] = 'SphereConv'
+    title = param_dic['title'] = param_sphere['title']
 
-    batch_size = param_dic['batch_size'] = 100
-    max_epochs = param_dic['max_epochs'] = 10
-    evaluate_num = param_dic['evaluate_sample_num_per_epoch'] = 100
-    out_num = param_dic['out_num'] = 10
-    filter_num = param_dic['filter_num'] = 32
-    filter_size = param_dic['filter_size'] = 7
-    padding = param_dic['padding'] = 0
-    stride = param_dic['stride'] = 1
-    hidden_size = param_dic['hidden_size'] = 128
-    optimizer = param_dic['optimizer'] = 'SGD'
-    lr = param_dic['lr'] = 0.001
-    weight_init_std = param_dic['weight_init_std'] = 'he'
+    param = config['parameter']
+    batch_size = param_dic['batch_size'] = param['batch_size']
+    max_epochs = param_dic['max_epochs'] = param['max_epochs']
+    evaluate_num = param_dic['evaluate_sample_num_per_epoch'] = param['evaluate_num']
+    out_num = param_dic['out_num'] = param['out_num']
+    filter_num = param_dic['filter_num'] = param['filter_num']
+    filter_size = param_dic['filter_size'] = param['filter_size']
+    padding = param_dic['padding'] = param['padding']
+    stride = param_dic['stride'] = param['stride']
+    hidden_size = param_dic['hidden_size'] = param['hidden_size']
+    optimizer = param_dic['optimizer'] = param['optimizer']
+    lr = param_dic['lr'] = param['optimizer']
+    weight_init_std = param_dic['weight_init_std'] = param['weight_init_std']
 
     # 保存
     with open(SAVE_DIR + 'setting.txt', 'a') as f:
